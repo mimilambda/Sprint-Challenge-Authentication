@@ -1,113 +1,44 @@
-const request = require('supertest')
-const server = require('./server.js')
-const db = require('../database/dbConfig.js')
-const bcrypt = require('bcryptjs')
+/*
+- when making a GET to the `/` endpoint 
+  the API should respond with status code 200 
+  and the following JSON object: `{ api: 'running' }`.
+*/
+const request = require('supertest'); // calling it "request" is a common practice
 
+const server = require('./server.js'); // this is our first red, file doesn't exist yet
 
+describe('server.js', () => {
+  // http calls made with supertest return promises, we can use async/await if desired
+  describe('index route', () => {
+    it('should return an OK status code from the index route', async () => {
+      const expectedStatusCode = 200;
 
+      // do a get request to our api (server.js) and inspect the response
+      const response = await request(server).get('/');
 
-describe('server', () => {
+      expect(response.status).toEqual(expectedStatusCode);
 
-    beforeEach(async () => {
-        await db('users').truncate();
+      // same test using promise .then() instead of async/await
+      // let response;
+      // return request(server).get('/').then(res => {
+      //   response = res;
+
+      //   expect(response.status).toEqual(expectedStatusCode);
+      // })
     });
 
-    describe('POST /REGISTER', () => {
-        it('should return 201 status', () => {
-            return request(server).post('/api/auth/register')
-                .send({
-                    username: "hoang",
-                    password: "123456"
-                })
-                .set('Content-Type', 'application/json')
-                .then(res => {
-                    expect(res.status).toBe(201)
-                    expect(res.body.username).toBe('hoang')
-                })
-        })
+    it('should return a JSON object fron the index route', async () => {
+      const expectedBody = { api: 'running' };
 
-        it('username should be {Name}', () => {
-            return request(server).post('/api/auth/register')
-                .send({
-                    username: "Mimi",
-                    password: "pass"
-                })
-                .set('Content-Type', 'application/json')
-                .then(res => {
-                    expect(res.status).toBe(201)
-                    expect(res.body.username).toBe('Mimi')
-                })
-        })
-    })
+      const response = await request(server).get('/');
+
+      expect(response.body).toEqual(expectedBody);
+    });
+
+    it('should return a JSON object fron the index route', async () => {
+      const response = await request(server).get('/');
+
+      expect(response.type).toEqual('application/json');
+    });
+  });
 });
-
-let token;
-
-describe('POST /LOGIN', () => {
-    it('Token should exist', async () => {
-        // await db.seed.run()
-        await db('users').insert([
-            { username: "admin", password: bcrypt.hashSync("admin", 16) },
-            { username: "user", password: bcrypt.hashSync("test", 16) }
-        ])
-
-        const res = await request(server).post('/api/auth/login')
-            .send({
-                username: "admin",
-                password: "admin"
-            })
-            .set('Content-Type', 'application/json')
-
-        expect(res.status).toBe(200)
-        expect(res.body.token).toBeTruthy()
-
-        token = res.body.token;
-    });
-
-    it('should return 200 status', () => {
-        return request(server).post('/api/auth/login')
-            .send({
-                username: "admin",
-                password: "admin"
-            })
-            .set('Content-Type', 'application/json')
-            .then(res => {
-                expect(res.status).toBe(200)
-                expect(res.body.message).toBe('Welcome admin!')
-            });
-    })
-
-    it('username should be `${Name}`', () => {
-        return request(server).post('/api/auth/login')
-            .send({
-                username: "Mimi",
-                password: "pass"
-            })
-            .set('Content-Type', 'application/json')
-            .then(res => {
-                expect(res.status).toBe(200)
-                expect(res.body.message).toBe('Welcome Mimi!')
-            })
-    })
-})
-
-
-
-
-describe('GET /api/users', () => {
-    it('returns json OK', () => {
-        return request(server).get('/api/jokes')
-            .expect('Content-Type', /json/)
-    });
-
-    it('should return 200 Status', () => {
-        return request(server).get('/api/jokes')
-            .set('authorization', token)
-            .then(res => {
-                expect(res.status).toBe(200)
-            })
-    })
-
-})
-
-
