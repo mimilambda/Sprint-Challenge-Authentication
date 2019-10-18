@@ -4,7 +4,7 @@
 */
 
 const bcrypt = require('bcryptjs');
-const Users = require('../users/user-model.js');
+const Users = require('../users/usersModel.js');
 module.exports = (req, res, next) => {
  
   console.log('req session', req.session);
