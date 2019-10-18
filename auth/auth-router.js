@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 
-const Users = require('../users/usersModel.js/index.js');
+const Users = require('../users/usersModel');
 
 // for endpoints beginning with /api/auth
 router.post('/register', (req, res) => {
@@ -41,18 +41,6 @@ router.post('/login', (req, res) => {
     });
 });
 
-// router.get('/logout', (req, res) => {
-//   if (req.session) {
-//     req.session.destroy(err => {
-//       if (err) {
-//         res.json({
-//           message: "you can checkout but you can't leave"
-//         });
-//       } else {
-//         res.end();
-//       }
-//     })
-//   }
-// });
+
 
 module.exports = router;
